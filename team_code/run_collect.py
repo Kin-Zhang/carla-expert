@@ -56,7 +56,7 @@ def main(args):
     # run official leaderboard ====>
     
     # kill CARLA
-    server_manager.stop()
+    # server_manager.stop()
 
 if __name__ == '__main__':
     

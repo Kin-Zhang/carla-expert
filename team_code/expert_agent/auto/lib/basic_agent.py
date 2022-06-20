@@ -71,6 +71,17 @@ class BasicAgent(object):
         # Initialize the planners
         self._local_planner = LocalPlanner(self._vehicle, opt_dict=opt_dict)
         self._global_planner = GlobalRoutePlanner(self._map, self._sampling_resolution)
+        
+        # Red light detection from SEED
+        # Coordinates of the center of the red light detector bounding box. In local coordinates of the vehicle, units are meters
+        self.center_bb_light_x = -2.0
+        self.center_bb_light_y = 0.0
+        self.center_bb_light_z = 0.0
+
+        # Extent of the red light detector bounding box. In local coordinates of the vehicle, units are meters. Size are half of the bounding box
+        self.extent_bb_light_x = 4.5
+        self.extent_bb_light_y = 1.5
+        self.extent_bb_light_z = 2.0
 
     def add_emergency_stop(self, control):
         """
@@ -203,56 +214,6 @@ class BasicAgent(object):
     def ignore_vehicles(self, active=True):
         """(De)activates the checks for stop signs"""
         self._ignore_vehicles = active
-
-    def _affected_by_traffic_light(self, lights_list=None, max_distance=None):
-        """
-        Method to check if there is a red light affecting the vehicle.
-
-            :param lights_list (list of carla.TrafficLight): list containing TrafficLight objects.
-                If None, all traffic lights in the scene are used
-            :param max_distance (float): max distance for traffic lights to be considered relevant.
-                If None, the base threshold value is used
-        """
-        if self._ignore_traffic_lights:
-            return (False, None)
-
-        if not lights_list:
-            lights_list = self._world.get_actors().filter("*traffic_light*")
-
-        if not max_distance:
-            max_distance = self._base_tlight_threshold
-
-        if self._last_traffic_light:
-            if self._last_traffic_light.state != carla.TrafficLightState.Red:
-                self._last_traffic_light = None
-            else:
-                return (True, self._last_traffic_light)
-
-        ego_vehicle_location = self._vehicle.get_location()
-        ego_vehicle_waypoint = self._map.get_waypoint(ego_vehicle_location)
-
-        for traffic_light in lights_list:
-            object_location = get_trafficlight_trigger_location(traffic_light)
-            object_waypoint = self._map.get_waypoint(object_location)
-
-            if object_waypoint.road_id != ego_vehicle_waypoint.road_id:
-                continue
-
-            ve_dir = ego_vehicle_waypoint.transform.get_forward_vector()
-            wp_dir = object_waypoint.transform.get_forward_vector()
-            dot_ve_wp = ve_dir.x * wp_dir.x + ve_dir.y * wp_dir.y + ve_dir.z * wp_dir.z
-
-            if dot_ve_wp < 0:
-                continue
-
-            if traffic_light.state != carla.TrafficLightState.Red:
-                continue
-
-            if is_within_distance(object_waypoint.transform, self._vehicle.get_transform(), max_distance, [0, 90]):
-                self._last_traffic_light = traffic_light
-                return (True, traffic_light)
-
-        return (False, None)
 
     def _vehicle_obstacle_detected(self, vehicle_list=None, max_distance=None, up_angle_th=90, low_angle_th=0, lane_offset=0):
         """
@@ -443,6 +404,80 @@ class BasicAgent(object):
         # 直接就是diff_v
         angle = -np.degrees(np.arctan2(-diff_v[1], diff_v[0]))
         return angle
+
+    def _affected_by_traffic_light(self, lights_list=None, max_distance=None):
+        # -----------------------------------------------------------
+        # Red light detection from SEEDs
+        # -----------------------------------------------------------
+        vehicle_transform = self._vehicle.get_transform()
+        vehicle_location = vehicle_transform.location
+        if lights_list is None:
+            self._world.get_actors().filter("*traffic_light*")
+        center_light_detector_bb = vehicle_transform.transform(carla.Location(x=self.center_bb_light_x, y=self.center_bb_light_y, z=self.center_bb_light_z))
+        extent_light_detector_bb = carla.Vector3D(x=self.extent_bb_light_x, y=self.extent_bb_light_y, z=self.extent_bb_light_z)
+        light_detector_bb = carla.BoundingBox(center_light_detector_bb, extent_light_detector_bb)
+        light_detector_bb.rotation = vehicle_transform.rotation
+        color2 = carla.Color(255, 255, 255, 255)
+
+        for light in lights_list:
+            # box in which we will look for traffic light triggers.            
+            center_bounding_box = light.get_transform().transform(light.trigger_volume.location)
+            center_bounding_box = carla.Location(center_bounding_box.x, center_bounding_box.y, center_bounding_box.z)
+            length_bounding_box = carla.Vector3D(light.trigger_volume.extent.x, light.trigger_volume.extent.y, light.trigger_volume.extent.z)
+            transform = carla.Transform(center_bounding_box) # can only create a bounding box from a transform.location, not from a location
+            bounding_box = carla.BoundingBox(transform.location, length_bounding_box)
+
+            gloabl_rot = light.get_transform().rotation
+            bounding_box.rotation = carla.Rotation(pitch = light.trigger_volume.rotation.pitch + gloabl_rot.pitch,
+                                                yaw   = light.trigger_volume.rotation.yaw   + gloabl_rot.yaw,
+                                                roll  = light.trigger_volume.rotation.roll  + gloabl_rot.roll)
+
+            if(self.check_obb_intersection(light_detector_bb, bounding_box) == True):
+                if ((light.state == carla.libcarla.TrafficLightState.Red)
+                    or (light.state == carla.libcarla.TrafficLightState.Yellow)):
+                    return (True, light)
+
+        return (False, None)
+        
+    def dot_product(self, vector1, vector2):
+        return (vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z)
+
+    def cross_product(self, vector1, vector2):
+        return carla.Vector3D(x=vector1.y * vector2.z - vector1.z * vector2.y, y=vector1.z * vector2.x - vector1.x * vector2.z, z=vector1.x * vector2.y - vector1.y * vector2.x)
+
+    def get_separating_plane(self, rPos, plane, obb1, obb2):
+        ''' Checks if there is a seperating plane
+        rPos Vec3
+        plane Vec3
+        obb1  Bounding Box
+        obb2 Bounding Box
+        '''
+        return (abs(self.dot_product(rPos, plane)) > (abs(self.dot_product((obb1.rotation.get_forward_vector() * obb1.extent.x), plane)) +
+                                                      abs(self.dot_product((obb1.rotation.get_right_vector()   * obb1.extent.y), plane)) +
+                                                      abs(self.dot_product((obb1.rotation.get_up_vector()      * obb1.extent.z), plane)) +
+                                                      abs(self.dot_product((obb2.rotation.get_forward_vector() * obb2.extent.x), plane)) +
+                                                      abs(self.dot_product((obb2.rotation.get_right_vector()   * obb2.extent.y), plane)) +
+                                                      abs(self.dot_product((obb2.rotation.get_up_vector()      * obb2.extent.z), plane)))
+                )
+    
+    def check_obb_intersection(self, obb1, obb2):
+        RPos = obb2.location - obb1.location
+        return not(self.get_separating_plane(RPos, obb1.rotation.get_forward_vector(), obb1, obb2) or
+                   self.get_separating_plane(RPos, obb1.rotation.get_right_vector(),   obb1, obb2) or
+                   self.get_separating_plane(RPos, obb1.rotation.get_up_vector(),      obb1, obb2) or
+                   self.get_separating_plane(RPos, obb2.rotation.get_forward_vector(), obb1, obb2) or
+                   self.get_separating_plane(RPos, obb2.rotation.get_right_vector(),   obb1, obb2) or
+                   self.get_separating_plane(RPos, obb2.rotation.get_up_vector(),      obb1, obb2) or
+                   self.get_separating_plane(RPos, self.cross_product(obb1.rotation.get_forward_vector(), obb2.rotation.get_forward_vector()), obb1, obb2) or
+                   self.get_separating_plane(RPos, self.cross_product(obb1.rotation.get_forward_vector(), obb2.rotation.get_right_vector()),   obb1, obb2) or
+                   self.get_separating_plane(RPos, self.cross_product(obb1.rotation.get_forward_vector(), obb2.rotation.get_up_vector()),      obb1, obb2) or
+                   self.get_separating_plane(RPos, self.cross_product(obb1.rotation.get_right_vector()  , obb2.rotation.get_forward_vector()), obb1, obb2) or
+                   self.get_separating_plane(RPos, self.cross_product(obb1.rotation.get_right_vector()  , obb2.rotation.get_right_vector()),   obb1, obb2) or
+                   self.get_separating_plane(RPos, self.cross_product(obb1.rotation.get_right_vector()  , obb2.rotation.get_up_vector()),      obb1, obb2) or
+                   self.get_separating_plane(RPos, self.cross_product(obb1.rotation.get_up_vector()     , obb2.rotation.get_forward_vector()), obb1, obb2) or
+                   self.get_separating_plane(RPos, self.cross_product(obb1.rotation.get_up_vector()     , obb2.rotation.get_right_vector()),   obb1, obb2) or
+                   self.get_separating_plane(RPos, self.cross_product(obb1.rotation.get_up_vector()     , obb2.rotation.get_up_vector()),      obb1, obb2))
+
 
 def carla2numpy(carla_vector, normalize=False):
     result = np.array([carla_vector.x, carla_vector.y])

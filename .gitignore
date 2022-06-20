@@ -4,3 +4,4 @@
 data/
 outputs/*
 .vscode/
+team_code/config/collect.yaml
