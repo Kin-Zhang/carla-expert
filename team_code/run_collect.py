@@ -29,9 +29,9 @@ def main(args):
     args.trafficManagerPort = args.port + 6000
     # =============> 
 
-    # # start CARLA
-    # server_manager = CarlaServerManager(args.carla_sh_path, port=args.port)
-    # server_manager.start()
+    # start CARLA
+    server_manager = CarlaServerManager(args.carla_sh_path, port=args.port)
+    server_manager.start()
 
     print('-'*20 + "TEST Agent: " + bc.OKGREEN + args.agent.split('/')[-1] + bc.ENDC + '-'*20)
     args.agent = os.path.join(args.absolute_path, args.agent)
@@ -54,7 +54,7 @@ def main(args):
     # run official leaderboard ====>
     
     # kill CARLA
-    # server_manager.stop()
+    server_manager.stop()
 
 if __name__ == '__main__':
     

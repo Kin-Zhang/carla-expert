@@ -6,10 +6,19 @@ This repo collects the expert in open-source for CARLA leaderboard. As we all kn
 
 Here are scores that four experts run in the `longest6.xml` provided from transfuser branch which is same route length as online leaderboard and with `eval_scenario`
 
-
 **!!! TODO RESULTS TABLE !!!**
 
 
+
+Another table from [Bernhard Jaeger's Master Thesis](https://kait0.github.io/assets/pdf/master_thesis_bernhard_jaeger.pdf) with NEAT eval routes files, here is their [official readme](https://github.com/autonomousvision/transfuser/blob/2022/team_code_autopilot/README.md):
+
+|        Method         | RC $\uarr$  | IS $\uarr$ | DS $\uarr$  |
+| :-------------------: | :---------- | :--------- | :---------- |
+| TransFuser Expert [6] | 86.05+-2.58 | 0.76+-0.01 | 62.69+-2.36 |
+|       Roach [5]       | 91.77+-0.75 | 0.79+-0.04 | 74.21+-3.23 |
+|     SEED - static     | 90.57+-2.57 | 0.96+-0.04 | 86.18+-2.22 |
+|   SEED - SAC (ours)   | 100.0+-0.0  | 0.95+-0.01 | 95.16+-1.01 |
+|      SEED (ours)      | 96.95+-1.14 | 0.94+-0.01 | 91.16+-2.17 |
 
 ## Setup
 
@@ -42,7 +51,10 @@ export PYTHONPATH="${CARLA_ROOT}/PythonAPI/carla/":"${SCENARIO_RUNNER_ROOT}":"${
 ```
 
 ## Running
-the default one is mmfn, please remember to change the path! or open the config to change the path!!
+the default one is auto with Kin's modification, please remember to change the path! or [open the config](team_code/config/collect.yaml) to change the path!!
+
+Notice the CARLA will start automatically with this script.
+
 ```bash
 python team_code/run_collect.py carla_sh_path=${CARLA_ROOT}/CarlaUE4.sh absolute_path=${CODE_FOLDER}
 ```
@@ -54,7 +66,7 @@ This expert used the trained RL for expert. This part of jobs is done by Kait fr
 
 Questions inside 已知问题：
 
-- Testing on Town01, finding that the velocity is quite high and the brake distance on traffic light may exceed the traffic light and lead the light may not shown at camera images. Town01测试时，红绿灯路口由于速度较高，停下时已经超过红绿灯了 导致红绿灯在图片中不可见
+- This repo slow down the speed that resolve this one. Origin repo: Testing on Town01, finding that the velocity is quite high and the brake distance on traffic light may exceed the traffic light and lead the light may not shown at camera images. 本分支下的速度比较慢 所以不会有这个现象；原repo 在Town01测试时，红绿灯路口由于速度较高，停下时已经超过红绿灯了 导致红绿灯在图片中不可见
 
 ### B. [MMFN](https://github.com/Kin-Zhang/mmfn)
 
@@ -62,9 +74,10 @@ This expert is from [https://github.com/Kin-Zhang/mmfn](https://github.com/Kin-Z
 
 
 
-已知问题：
+Questions inside 已知问题：
 
 - because of TTC, the brake will be in advance which the reason may not appear if you are using just one camera for trainning agent. 因为内置的time to collision，有时候刹车会较为提前，如果用一个相机可能刹车原因并不会出现在照片中
+- really cautious agent. 有点太谨慎了... 还有一定的修改空间
 
 ### C. [SEED](https://github.com/autonomousvision/transfuser/tree/2022/team_code_autopilot)
 
@@ -78,7 +91,7 @@ Questions inside 已知问题：
 
 ### D. [AUTO](https://github.com/carla-simulator/carla/blob/master/PythonAPI/carla/agents/navigation/local_planner.py)
 
-This expert if from CARLA self for local planner with walker event evolved from mmfn repo by Kin.
+This expert if from CARLA self for local planner with walker event involved from mmfn repo by Kin.
 
 
 
@@ -86,10 +99,19 @@ Questions inside 已知问题：
 
 - only using the distance, efficient but not smart in long term. 仅以距离为因素进行刹停，有效但是长远来看并不smart
 
+### Note
+Here are some notes.
+
+1. remove stop infra: Since leaderboard didn't count the stop infraction, it removed in this repo (MMFN and AUTO agent) and submodule. And sometimes the stop sign may also cause some mistake on no reason stop when training the agent
+2. for the data, you need collect, pls add by your need, there are some examples inside the MMFN and SEED experts
+3. ...
+
+
 ## Plan
 
 - [ ] Involved the e2e agent also. Big hope... Since different e2e agent need different data form
-- [ ] Experiemtns all the e2e agent in same expert and test their performance, since in the leaderboard, their agent has train in different expert and different dataset, it should be control the suitation in the experiment. 最好做一次完整的实验，控制所有的变量（数据 专家的一致性） 来评判e2e agent的有效性，从leaderboard看来大家的expert不一致，训练数据大小也各不相同，直接从榜单结果看谁的方法更好并不完全有效
+- [ ] Experiemtns all the e2e agent in same expert and test their performance, since in the leaderboard, their agent has train in different expert and different dataset, it should be control the suitation in the experiment. 最好做一次完整的实验，控制所有的变量（数据 专家的一致性） 来评判e2e agent的有效性，从leaderboard看来大家的expert不一致，训练数据大小也各不相同，直接从榜单结果看谁的方法更好并不是最佳的方式
+- [ ] ...
 
 
 Welcome to contribute!

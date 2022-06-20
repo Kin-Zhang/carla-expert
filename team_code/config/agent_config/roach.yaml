@@ -1,5 +1,6 @@
-save_data: True
+save_data: False
 data_save: data/seed
+route_file: None
 entry_point: rl_birdview.rl_birdview_agent:RlBirdviewAgent
 wb_run_path: null
 wb_ckpt_step: null
