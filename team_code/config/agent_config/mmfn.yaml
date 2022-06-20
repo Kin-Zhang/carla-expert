@@ -1,0 +1,21 @@
+force_destory_actor: True # maybe have better effects!
+weather_change: False # whether change the weather
+max_stop_num: 300 
+stop_thresh: 0.1
+save_video_fps: 20
+save_data: False
+num_per_flush: 400
+data_save: data/mmfn
+camera_x: 1.5
+camera_z: 2.4
+debug_print: True # pls remember to set False when collect data 
+image_height: 288
+image_width: 1024
+slow_distance: 15
+route_id: None
+counter_destory: 400
+max_speed: 20 # km/h
+slow_speed: 10 # km/h
+max_throttle: 0.6
+frame_record: 2
+wandb_mode: "online"

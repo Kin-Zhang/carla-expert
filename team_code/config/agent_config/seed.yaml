@@ -1,0 +1,5 @@
+save_data: True
+num_per_flush: 400
+debug_print: True # pls remember to set False when collect data 
+data_save: data/seed
+route_id: None
