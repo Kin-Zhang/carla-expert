@@ -36,6 +36,7 @@ class Auto_Agent(AutonomousAgent):
         self.num_frames = 0
         self.stop_counter = 0
         self.config = config
+        self.route_file = self.config.route_file
         self.rgbs, self.sems, self.info, self.brak = [], [], [], []
 
     def sensors(self):
@@ -73,10 +74,8 @@ class Auto_Agent(AutonomousAgent):
         else:
             self.stop_counter = 0
 
-        if len(self.rgbs)>self.config.num_per_flush:
-            self.flush_data()
 
-        if self.num_frames % 5 == 0 and self.stop_counter < self.config.max_stop_num:
+        if self.config.save_data and self.num_frames % 5 == 0 and self.stop_counter < self.config.max_stop_num:
             vel = get_speed(self._vehicle)/3.6 #  m/s
             is_junction = self._map.get_waypoint(self._vehicle.get_transform().location).is_junction
             self.rgbs.append(rgb[...,:3])
@@ -86,6 +85,8 @@ class Auto_Agent(AutonomousAgent):
             # change weather
             if not self.config.debug_print and self.num_frames % 50 == 0:
                 self.change_weather()
+            if len(self.rgbs)>self.config.num_per_flush:
+                self.flush_data()
 
         self.num_frames += 1
         if self.stop_counter>500:
@@ -116,10 +117,11 @@ class Auto_Agent(AutonomousAgent):
         self._world = self._vehicle.get_world()
         self._map = self._world.get_map()
         self._agent = BasicAgent(self._vehicle)
+        
         plan = []
         prev_wp = None
-        for transform, _ in self.origin_global_plan_world_coord:
-            wp = CarlaDataProvider.get_map().get_waypoint(transform.location)
+        for i in self.route_file:
+            wp = CarlaDataProvider.get_map().get_waypoint(carla.Location(x=i[0],y=i[1],z=i[2]))
             if prev_wp:
                 plan.extend(self._agent.trace_route(prev_wp, wp))
             prev_wp = wp

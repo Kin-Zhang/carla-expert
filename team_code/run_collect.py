@@ -43,8 +43,10 @@ def main(args):
     Path(data_folder).mkdir(exist_ok=True, parents=True)
     args.checkpoint = os.path.join(data_folder,f'{route_name}_{args.checkpoint}')
 
-    if os.path.exists(args.checkpoint):
+    if os.path.exists(args.checkpoint) and not args.resume:
         print(f"It will overwrite the things! {bc.WARNING}ATTENTION {args.checkpoint}{bc.ENDC}")
+    elif args.resume:
+        print(f"{bc.UNDERLINE}Contiune the route from file{bc.ENDC}: {args.checkpoint}")
     else:
         print(f"Create the result to: {args.checkpoint}")
         

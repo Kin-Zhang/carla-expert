@@ -19,3 +19,4 @@ slow_speed: 10 # km/h
 max_throttle: 0.6
 frame_record: 2
 wandb_mode: "online"
+route_file: None
