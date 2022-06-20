@@ -4,8 +4,7 @@ This repo collects the expert in open-source for CARLA leaderboard. As we all kn
 
 对于一个端到端驾驶来说，第一步就是收集数据，在真实世界，收集数据时都是以人驾驶车为主；而在仿真世界中 一般采用全局视角写一个专家策略；以此作为收集数据时的策略。此repo主要提供一些已开源 并且在e2e agent上训练使用的一些experts
 
-Here are scores that four experts run in the testing route xml provided from CARLA official leaderboard branch and with `public_scenario`
-
+Here are scores that four experts run in the `longest6.xml` provided from transfuser branch which is same route length as online leaderboard and with `eval_scenario`
 
 
 **!!! TODO RESULTS TABLE !!!**
@@ -33,18 +32,21 @@ Set the correct the absolute path and CARLA run path!!!
 
 ```bash
 conda activate py37
+# ===> pls remeber to change this one
 export CODE_FOLDER=/home/kin/workspace/carla-expert
 export CARLA_ROOT=/home/kin/CARLA_0.9.10.1
+# ===> pls remeber to change this one
 export SCENARIO_RUNNER_ROOT=${CODE_FOLDER}/scenario_runner
 export LEADERBOARD_ROOT=${CODE_FOLDER}/leaderboard
 export PYTHONPATH="${CARLA_ROOT}/PythonAPI/carla/":"${SCENARIO_RUNNER_ROOT}":"${LEADERBOARD_ROOT}":"${CARLA_ROOT}/PythonAPI/carla/dist/carla-0.9.10-py3.7-linux-x86_64.egg":"${CODE_FOLDER}/team_code":${PYTHONPATH}
 ```
 
 ## Running
-the default one is mmfn, please remember to change the path!
+the default one is mmfn, please remember to change the path! or open the config to change the path!!
 ```bash
-python run_collect.py carla_sh_path=${CARLA_ROOT}/CarlaUE4.sh absolute_path=${CODE_FOLDER}
+python team_code/run_collect.py carla_sh_path=${CARLA_ROOT}/CarlaUE4.sh absolute_path=${CODE_FOLDER}
 ```
+
 ### A. [Roach](https://github.com/zhejz/carla-roach)
 This expert used the trained RL for expert. This part of jobs is done by Kait from this repo: [https://github.com/Kait0/carla-roach](https://github.com/Kait0/carla-roach)
 

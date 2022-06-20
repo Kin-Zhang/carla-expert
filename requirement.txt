@@ -1,0 +1,32 @@
+# TODO
+filelock
+hydra-core==1.1
+tqdm
+
+# leaderboard
+dictor
+requests
+opencv-python==4.2.0.32
+pygame
+tabulate
+
+# scenario_runner
+py-trees==0.8.3
+networkx==2.2
+Shapely==1.6.4.post2
+psutil
+xmlschema==1.0.18
+ephem
+numpy
+matplotlib
+six
+
+# kin
+scipy
+wandb
+ray
+pickle-mixin
+tqdm
+einops
+gym
+h5py
