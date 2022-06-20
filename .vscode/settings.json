@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./leaderboard",
+        "./scenario_runner"
+    ]
+}

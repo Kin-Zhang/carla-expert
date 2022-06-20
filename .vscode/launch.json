@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+		// kill -9 $(pgrep -f "python3 -m debugpy" | xargs echo)
+		// python -m debugpy --listen 5678 --wait-for-client xxx.py
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "LDebug",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+            "host": "localhost",
+            "port": 5678
+            }
+        },
+        {
+            "name": "Current",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        }
+    ]
+}
