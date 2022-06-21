@@ -1,6 +1,6 @@
 #!/bin/bash
 
-conda activate lav
+conda activate py37
 
 # setting the env
 export CODE_FOLDER=/home/kin/workspace/carla-expert

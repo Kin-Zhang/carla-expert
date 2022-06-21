@@ -30,3 +30,4 @@ tqdm
 einops
 gym
 h5py
+hydra-core==1.1

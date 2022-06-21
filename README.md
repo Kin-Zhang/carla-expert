@@ -1,24 +1,21 @@
-# CARLA-expert
+# ✨ CARLA-expert
 
-This repo collects the expert in open-source for CARLA leaderboard. As we all known that the expert is important for end-to-end learning driving. The expert is also the upper bound of learning agent performance, smart and efficient expert sometimes may more important than your agent network. 
+This repo collects the expert in open-source for CARLA leaderboard. As we all known that the expert is important for end-to-end learning driving. The expert is also the upper bound of learning agent performance, smart and efficient expert <u>sometimes may more important than</u> your agent network. 
 
 对于一个端到端驾驶来说，第一步就是收集数据，在真实世界，收集数据时都是以人驾驶车为主；而在仿真世界中 一般采用全局视角写一个专家策略；以此作为收集数据时的策略。此repo主要提供一些已开源 并且在e2e agent上训练使用的一些experts
 
-Here are scores that four experts run in the `longest6.xml` provided from transfuser branch which is same route length as online leaderboard and with `eval_scenario`
+Here are scores that four experts run in the `longest6.xml` provided from transfuser branch which is same route length as online leaderboard and with `eval_scenario`. [Click here](leaderboard/data/longest6_complete.xml) to open the route file. Check the [Evaluation and metrics](https://leaderboard.carla.org/#evaluation-and-metrics) in the official leaderboard.
 
-**!!! TODO RESULTS TABLE !!!**
+It only run one time with 36 routes, so just for reference, pls check results more detailed on [data/results](data/results).
 
+|   Method | Driving Score ↑ | infra ↑ | Route completion ↑ |
+| :-------: | :---------- | :--------- | :---------- |
+|   MMFN* | 97.00 | 0.98 | 98.90 |
+|  Roach  | 66.73 | 0.77 | 88.61 |
+|   SEED  | 77.91 | 0.90 | 85.49 |
+|  AUTO*  | 63.50 | 0.65 | 96.71 |
 
-
-Another table from [Bernhard Jaeger's Master Thesis](https://kait0.github.io/assets/pdf/master_thesis_bernhard_jaeger.pdf) with NEAT eval routes files, here is their [official readme](https://github.com/autonomousvision/transfuser/blob/2022/team_code_autopilot/README.md):
-
-|        Method         | RC $\uarr$  | IS $\uarr$ | DS $\uarr$  |
-| :-------------------: | :---------- | :--------- | :---------- |
-| TransFuser Expert [6] | 86.05+-2.58 | 0.76+-0.01 | 62.69+-2.36 |
-|       Roach [5]       | 91.77+-0.75 | 0.79+-0.04 | 74.21+-3.23 |
-|     SEED - static     | 90.57+-2.57 | 0.96+-0.04 | 86.18+-2.22 |
-|   SEED - SAC (ours)   | 100.0+-0.0  | 0.95+-0.01 | 95.16+-1.01 |
-|      SEED (ours)      | 96.95+-1.14 | 0.94+-0.01 | 91.16+-2.17 |
+*: TBD
 
 ## Setup
 
@@ -26,6 +23,8 @@ please remember to clone with `--recurse-submodules`
 
 ```bash
 git clone --recurse-submodules https://github.com/Kin-Zhang/carla-expert
+conda create -n py37 python=3.7
+pip3 install -r requirements.txt
 ```
 
 For people who don't have CARLA [在内地的同学可以打开scripts换一下函数 走镜像下载更快点.. ]
@@ -33,7 +32,7 @@ For people who don't have CARLA [在内地的同学可以打开scripts换一下�
 ```bash
 ./run/setup_carla.sh
 # input version
-11
+10.1
 # auto download now ...
 ```
 
@@ -51,7 +50,7 @@ export PYTHONPATH="${CARLA_ROOT}/PythonAPI/carla/":"${SCENARIO_RUNNER_ROOT}":"${
 ```
 
 ## Running
-the default one is auto with Kin's modification, please remember to change the path! or [open the config](team_code/config/collect.yaml) to change the path!!
+🚘 the default one is auto with Kin's modification, please remember to change the path! or [open the config](team_code/config/collect.yaml) to change the path!!
 
 Notice the CARLA will start automatically with this script.
 
@@ -88,10 +87,11 @@ This expert is from [https://github.com/autonomousvision/transfuser/tree/2022/te
 Questions inside 已知问题：
 
 - change lane may have collision according to their new paper. 根据新paper来看，换道情况并未考虑进入
+- really slow by default setting, advise to modify the max_speed in their script. 测试的时候 默认配置下速度很慢... 如果介意的话 记改改速度
 
 ### D. [AUTO](https://github.com/carla-simulator/carla/blob/master/PythonAPI/carla/agents/navigation/local_planner.py)
 
-This expert if from CARLA self for local planner with walker event involved from mmfn repo by Kin.
+This expert if from CARLA self for local planner with walker event involved from mmfn repo by [Kin](https://github.com/Kin-Zhang).
 
 
 
@@ -111,6 +111,7 @@ Here are some notes.
 
 - [ ] Involved the e2e agent also. Big hope... Since different e2e agent need different data form
 - [ ] Experiemtns all the e2e agent in same expert and test their performance, since in the leaderboard, their agent has train in different expert and different dataset, it should be control the suitation in the experiment. 最好做一次完整的实验，控制所有的变量（数据 专家的一致性） 来评判e2e agent的有效性，从leaderboard看来大家的expert不一致，训练数据大小也各不相同，直接从榜单结果看谁的方法更好并不是最佳的方式
+- [ ] Write a simple technical report of this one.
 - [ ] ...
 
 
@@ -124,5 +125,10 @@ GITHUB code repo:
 - [dotchen/WorldOnRails](https://github.com/dotchen/WorldOnRails)
 - [Kin-Zhang/mmfn](https://github.com/Kin-Zhang/mmfn)
 
-Here are other discussion on CARLA leaderboard: [https://github.com/Kin-Zhang/LAV/discussions](https://github.com/Kin-Zhang/LAV/discussions)
+Here are discussion links on CARLA leaderboard: [https://github.com/Kin-Zhang/LAV/discussions](https://github.com/Kin-Zhang/LAV/discussions)
 
+✨✨Stargazers, positive feedback
+
+---
+
+[![Stargazers repo roster for @nastyox/Repo-Roster](https://reporoster.com/stars/Kin-Zhang/carla-expert)](https://github.com/Kin-Zhang/carla-expert/stargazers)
