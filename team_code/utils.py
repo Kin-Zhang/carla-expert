@@ -28,7 +28,7 @@ def kill_carla():
 
 
 class CarlaServerManager():
-    def __init__(self, carla_sh_str, port=2000, configs=None, t_sleep=5):
+    def __init__(self, carla_sh_str, port=2000, configs=None, t_sleep=10):
         self._carla_sh_str = carla_sh_str
         # self._root_save_dir = root_save_dir
         self._t_sleep = t_sleep
@@ -50,10 +50,10 @@ class CarlaServerManager():
                     port += 5
 
     def start(self):
-        kill_carla()
+        # kill_carla()
         for cfg in self.env_configs:
             cmd = f'CUDA_VISIBLE_DEVICES={cfg["gpu"]} bash {self._carla_sh_str} ' \
-                f'--quality-level=Epic -carla-rpc-port={cfg["port"]}'
+                f'--quality-level=Low -carla-rpc-port={cfg["port"]}'
             log.info(cmd)
             server_process = subprocess.Popen(cmd, shell=True, preexec_fn=os.setsid)
         time.sleep(self._t_sleep)

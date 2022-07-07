@@ -15,7 +15,7 @@ It only run one time with 36 routes, so just for reference, pls check results mo
 |   SEED  | 77.91 | 0.90 | 85.49 |
 |  AUTO*  | 63.50 | 0.65 | 96.71 |
 
-*: TBD
+*: Please note that MMFN and AUTO have some tricks with god view and actions like **force destroy**, so that their route completions are higher than others. It's a trick but useful for training data. The origin repo didn't have this, I added here.
 
 ## Setup
 
