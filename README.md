@@ -125,7 +125,7 @@ GITHUB code repo:
 - [dotchen/WorldOnRails](https://github.com/dotchen/WorldOnRails)
 - [Kin-Zhang/mmfn](https://github.com/Kin-Zhang/mmfn)
 
-Here are discussion links on CARLA leaderboard: [https://github.com/Kin-Zhang/LAV/discussions](https://github.com/Kin-Zhang/LAV/discussions)
+**Here are discussion links on CARLA leaderboard: [https://github.com/Kin-Zhang/carla-expert/discussions](https://github.com/Kin-Zhang/carla-expert/discussions)**
 
 ✨✨Stargazers, positive feedback
 
