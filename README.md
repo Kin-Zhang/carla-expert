@@ -1,4 +1,5 @@
-# ✨ CARLA-expert
+✨ CARLA-expert
+---
 
 This repo collects the expert in open-source for CARLA leaderboard. As we all known that the expert is important for end-to-end learning driving. The expert is also the upper bound of learning agent performance, smart and efficient expert <u>sometimes may more important than</u> your agent network. 
 
@@ -119,13 +120,25 @@ Welcome to contribute!
 
 ## Acknowledgements
 
-GITHUB code repo:
+If you use this repo in your research, please consider citing our work where we also discussed the influence between experts performance and e2e agent:
+```
+@inproceedings{zhang2022mmfn,
+  title={MMFN: Multi-Modal-Fusion-Net for End-to-End Driving},
+  author={Zhang, Qingwen and Tang, Mingkai and Geng, Ruoyu and Chen, Feiyi and Xin, Ren and Wang, Lujia},
+  booktitle={2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  pages={8638--8643},
+  year={2022},
+  organization={IEEE}
+}
+```
+
+GitHub code repo:
 - [zhejz/carla-roach](https://github.com/zhejz/carla-roach)
 - [autonomousvision/transfuser](https://github.com/autonomousvision/transfuser)
 - [dotchen/WorldOnRails](https://github.com/dotchen/WorldOnRails)
 - [Kin-Zhang/mmfn](https://github.com/Kin-Zhang/mmfn)
 
-**Here are discussion links on CARLA leaderboard: [https://github.com/Kin-Zhang/carla-expert/discussions](https://github.com/Kin-Zhang/carla-expert/discussions)**
+**Here are discussion links on the CARLA leaderboard: [https://github.com/Kin-Zhang/carla-expert/discussions](https://github.com/Kin-Zhang/carla-expert/discussions)**
 
 ✨✨Stargazers, positive feedback
 
